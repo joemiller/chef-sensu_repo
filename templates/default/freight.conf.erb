@@ -1,0 +1,13 @@
+# Directories for the Freight library and Freight cache.  Your web
+# server's document root should be `$VARCACHE`.
+VARLIB="<%= @node.sensu_repo.base_dir %>/freight"
+VARCACHE="<%= @node.sensu_repo.base_dir %>/html/apt"
+
+# Default `Origin` and `Label` fields for `Release` files.
+ORIGIN="<%= @node.sensu_repo.apt.origin %>"
+LABEL="<%= @node.sensu_repo.apt.label %>"
+
+# GPG key to use to sign repositories.  This is required by the `apt`
+# repository provider.  Use `gpg --gen-key` (see `gpg`(1) for more
+# details) to generate a key and put its email address here.
+GPG="<%= @node.sensu_repo.gpg.name.email %>"

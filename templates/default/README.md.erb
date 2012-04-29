@@ -1,0 +1,65 @@
+sensu repo base dir
+===================
+
+Welcome to "<%= @node.sensu_repo.base_dir %>".
+
+This is the base directory of the Sensu yum/apt repos. Everything involving
+repo management happens from here!
+
+Chef
+----
+Much of this directory is managed by the `sensu_repo` cookbook.
+
+User
+----
+There is a special system user '<%= @node.sensu_repo.user %>' responsible for managing
+the repos. This is also his home directory.
+
+Important Directories and Files
+-------------------------------
+The directory structure is:
+
+*   freight/    - Staging area for freight, the apt repo tools.
+*   html/       - This is the doc root for the yum and apt repos. It could be
+                  served directly from this server, but we'll sync it to
+                  S3.
+*   scripts/    - Helpers scripts for managing the repos. See below.
+*   .gnupg/     - Contains the '<%= @node.sensu_repo.user %>' user's GPG keys
+                  used for signing packages.
+
+Other important files outside of this directory:
+
+    /etc/freight.conf   - Config file for freight.
+
+Scripts
+-------
+
+Scripts are in <%= @node.sensu_repo.base_dir %>/scripts. They should be run
+as the '<%= @node.sensu_repo.user %>' user so the permissions stay correct
+and the correct GPG key is used.
+
+### `yum_add_rpms.rb`
+
+Adds 1 or more RPMs to the yum repo and signs them with GPG:
+```
+sudo -u repo -i /repo/scripts/yum_add_rpms.rb *.rpm
+```
+
+### `apt_add_debs.rb`
+
+Adds 1 or more RPMs to the freight system then calls freight to add them
+to the apt pool and sign the pool w/ GPG.
+
+```
+sudo -u repo -i /repo/scripts/apt_add_debs.rb *.deb
+```
+
+### `sync_to_s3.rb`
+
+Syncs the `html/` dir to S3. Run as the '<%= @node.sensu_repo.user %>' user
+so that the correct .s3cfg file is loaded.
+
+The S3 keys need to be setup before the first run of this script, ie:
+```
+sudo -u repo -i s3cmd --configure
+```
