@@ -34,32 +34,4 @@ Other important files outside of this directory:
 Scripts
 -------
 
-Scripts are in <%= @node.sensu_repo.base_dir %>/scripts. They should be run
-as the '<%= @node.sensu_repo.user %>' user so the permissions stay correct
-and the correct GPG key is used.
-
-### `yum_add_rpms.rb`
-
-Adds 1 or more RPMs to the yum repo and signs them with GPG:
-```
-sudo -u repo -i /repo/scripts/yum_add_rpms.rb *.rpm
-```
-
-### `apt_add_debs.rb`
-
-Adds 1 or more RPMs to the freight system then calls freight to add them
-to the apt pool and sign the pool w/ GPG.
-
-```
-sudo -u repo -i /repo/scripts/apt_add_debs.rb *.deb
-```
-
-### `sync_to_s3.rb`
-
-Syncs the `html/` dir to S3. Run as the '<%= @node.sensu_repo.user %>' user
-so that the correct .s3cfg file is loaded.
-
-The S3 keys need to be setup before the first run of this script, ie:
-```
-sudo -u repo -i s3cmd --configure
-```
+See here for usage of the scripts: https://github.com/joemiller/sensu-build-box/blob/master/readme.md
