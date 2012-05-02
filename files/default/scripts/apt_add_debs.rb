@@ -13,6 +13,9 @@ end
 
 system "freight cache"
 
+## load and run our sync_to_s3 script
+require sync_to_s3_script = File.join(File.dirname(__FILE__), 'sync_to_s3')
+
 # ex:
 # freight add sensu_0.9.5-35_amd64.deb apt/sensu
 # freight add sensu_0.9.5-35_i386.deb apt/sensu

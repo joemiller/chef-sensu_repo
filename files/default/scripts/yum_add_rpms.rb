@@ -46,3 +46,6 @@ end
   system "createrepo -d #{REPO_BASE}/html/yum/el/5/#{arch}/"
   system "createrepo -d #{REPO_BASE}/html/yum/el/6/#{arch}/"
 end
+
+## load and run our sync_to_s3 script
+require File.join(File.dirname(__FILE__), 'sync_to_s3')
