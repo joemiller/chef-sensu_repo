@@ -37,8 +37,8 @@ ARGV.each do |rpm|
   else
     FileUtils.cp(rpm, "#{REPO_BASE}/html/yum/el/5/#{arch}/#{rpm_basename}")
     FileUtils.cp(rpm, "#{REPO_BASE}/html/yum/el/6/#{arch}/#{rpm_basename}")
-    sign_rpm("#{REPO_BASE}/html/yum/el/5/#{arch}/#{rpm_basename}")
-    sign_rpm("#{REPO_BASE}/html/yum/el/6/#{arch}/#{rpm_basename}")
+    # sign_rpm("#{REPO_BASE}/html/yum/el/5/#{arch}/#{rpm_basename}")
+    # sign_rpm("#{REPO_BASE}/html/yum/el/6/#{arch}/#{rpm_basename}")
   end  
 end
 
