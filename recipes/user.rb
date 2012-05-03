@@ -21,3 +21,8 @@ template "#{node.sensu_repo.base_dir}/README.md" do
   mode      0644
   source    "README.md.erb"
 end
+
+cookbook_file "#{node.sensu_repo.base_dir}/html/index.html" do
+  source  "index.html"
+  mode    0644
+end
