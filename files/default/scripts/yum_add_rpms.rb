@@ -43,8 +43,8 @@ ARGV.each do |rpm|
 end
 
 %w[ i386 x86_64 noarch ].each do |arch|
-  system "createrepo -d #{REPO_BASE}/html/yum/el/5/#{arch}/"
-  system "createrepo -d #{REPO_BASE}/html/yum/el/6/#{arch}/"
+  system "createrepo #{REPO_BASE}/html/yum/el/5/#{arch}/"
+  system "createrepo #{REPO_BASE}/html/yum/el/6/#{arch}/"
 end
 
 ## load and run our sync_to_s3 script
