@@ -18,5 +18,5 @@ end
 remote_file "#{Chef::Config['file_cache_path']}/s3cmd.tar.gz" do
   source s3cmd_source_url
   mode 0644
-  notifies :run, "execute[install-s3cmd]", :immediately
+  notifies :run, "bash[install-s3cmd]", :immediately
 end
