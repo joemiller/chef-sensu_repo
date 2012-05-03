@@ -4,12 +4,6 @@
 
 s3cmd_source_url = "https://github.com/s3tools/s3cmd/tarball/master"
 
-remote_file "#{Chef::Config['file_cache_path']}/s3cmd.tar.gz" do
-  source s3cmd_source_url
-  mode 0644
-  notifies :run, "execute[install-s3cmd]", :immediately
-end
-
 bash "install-s3cmd" do
   user "root"
   cwd Chef::Config['file_cache_path']
@@ -19,4 +13,10 @@ bash "install-s3cmd" do
     tar zxf s3cmd.tar.gz --strip-components 1 -C s3cmd
   EOH
   action :nothing
+end
+
+remote_file "#{Chef::Config['file_cache_path']}/s3cmd.tar.gz" do
+  source s3cmd_source_url
+  mode 0644
+  notifies :run, "execute[install-s3cmd]", :immediately
 end
