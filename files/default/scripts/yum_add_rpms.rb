@@ -30,6 +30,7 @@ if $0 == __FILE__
     usage
   end
 
+  repo = ARGV.shift
   unless repo =~ /^\//
     puts "Invalid repo: '#{repo}'"
     usage
