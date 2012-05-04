@@ -13,3 +13,8 @@ default.sensu_repo.gpg.batch_config "/tmp/gpg_batch_config"
 
 default.sensu_repo.gpg.key_type = "RSA"
 default.sensu_repo.gpg.key_length = "2048"
+
+# (May 2012) due to a bug in --follow-symlinks, we need a newer version
+# of s3cmd from the git repo. Until this is resolved and the distros release
+# new packages, we install s3cmd from source
+default.sensu_repo.s3cmd.source_url = "https://github.com/s3tools/s3cmd/tarball/master"
