@@ -1,13 +1,19 @@
 #!/usr/bin/env ruby
 
+# TODO: do something less ghetto with the supported rhel versions
+
 require 'pty'
 require 'expect'
 require 'fileutils'
 
 require File.join(File.dirname(__FILE__), 'settings')
 
-if ARGV.empty?
-  puts "Usage: #{$0} file1.rpm [[file2.rpm] ... [fileX.rpm]]"
+def usage
+  puts "Usage: #{$0} repo file1.rpm [[file2.rpm] ... [fileX.rpm]]"
+  puts
+  puts "repo examples:"
+  puts "  - /              (main/base repo)"
+  puts "  - /unstable      (testing/beta repo)"
   exit 1
 end
 
@@ -19,33 +25,46 @@ def sign_rpm(rpm)
   end
 end
 
-ARGV.each do |rpm|
-
-  rpm_basename = File.basename(rpm)
-
-  arch = ''
-  if rpm =~ /i386/
-    arch = 'i386'
-  elsif rpm =~ /x86_64/
-    arch = 'x86_64'
-  elsif rpm =~ /noarch/
-    arch = 'noarch'
+if $0 == __FILE__
+  if ARGV.empty?
+    usage
   end
 
-  if arch == ''
-    puts "Errror: couldn't determine architecture of rpm '#{rpm}'. skipping"
-  else
-    FileUtils.cp(rpm, "#{REPO_BASE}/html/yum/el/5/#{arch}/#{rpm_basename}")
-    FileUtils.cp(rpm, "#{REPO_BASE}/html/yum/el/6/#{arch}/#{rpm_basename}")
-    # sign_rpm("#{REPO_BASE}/html/yum/el/5/#{arch}/#{rpm_basename}")
-    # sign_rpm("#{REPO_BASE}/html/yum/el/6/#{arch}/#{rpm_basename}")
-  end  
-end
+  unless repo =~ /^\//
+    puts "Invalid repo: '#{repo}'"
+    usage
+  end
 
-%w[ i386 x86_64 noarch ].each do |arch|
-  system "createrepo #{REPO_BASE}/html/yum/el/5/#{arch}/"
-  system "createrepo #{REPO_BASE}/html/yum/el/6/#{arch}/"
-end
+  repo_path = "#{REPO_BASE}/html/yum/#{repo}"
 
-## load and run our sync_to_s3 script
-require File.join(File.dirname(__FILE__), 'sync_to_s3')
+  ARGV.each do |rpm|
+
+    rpm_basename = File.basename(rpm)
+
+    arch = ''
+    if rpm =~ /i386/
+      arch = 'i386'
+    elsif rpm =~ /x86_64/
+      arch = 'x86_64'
+    elsif rpm =~ /noarch/
+      arch = 'noarch'
+    end
+
+    if arch == ''
+      puts "Errror: couldn't determine architecture of rpm '#{rpm}'. skipping"
+    else
+      FileUtils.cp(rpm, "#{repo_path}/el/5/#{arch}/#{rpm_basename}")
+      FileUtils.cp(rpm, "#{repo_path}/el/6/#{arch}/#{rpm_basename}")
+      # sign_rpm("#{repo_path}/el/5/#{arch}/#{rpm_basename}")
+      # sign_rpm("#{repo_path}/el/6/#{arch}/#{rpm_basename}")
+    end  
+  end
+
+  %w[ i386 x86_64 noarch ].each do |arch|
+    system "createrepo #{repo_path}/el/5/#{arch}/"
+    system "createrepo #{repo_path}/el/6/#{arch}/"
+  end
+
+  ## load and run our sync_to_s3 script
+  require File.join(File.dirname(__FILE__), 'sync_to_s3')
+end

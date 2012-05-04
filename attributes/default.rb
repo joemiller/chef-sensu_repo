@@ -4,7 +4,6 @@ default.sensu_repo.s3_bucket = 'repos.sensuapp.org'
 
 default.sensu_repo.apt.origin = 'Sensu'
 default.sensu_repo.apt.label = 'Sensu'
-default.sensu_repo.apt.distro = "apt/sensu"
 
 default.sensu_repo.gpg.name.real "Sonian Inc"
 default.sensu_repo.gpg.name.comment "Sensu signing key"
