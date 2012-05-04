@@ -12,8 +12,8 @@ def usage
   puts "Usage: #{$0} repo file1.rpm [[file2.rpm] ... [fileX.rpm]]"
   puts
   puts "repo examples:"
-  puts "  - /              (main/base repo)"
-  puts "  - /unstable      (testing/beta repo)"
+  puts "  - /yum              (the main repo)"
+  puts "  - /yum-unstable     (the testing/beta repo)"
   exit 1
 end
 
@@ -35,7 +35,7 @@ if $0 == __FILE__
     usage
   end
 
-  repo_path = "#{REPO_BASE}/html/yum/#{repo}"
+  repo_path = "#{REPO_BASE}/html/#{repo}"
 
   ARGV.each do |rpm|
 
