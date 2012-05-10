@@ -1,108 +1,110 @@
-<!-- 
-  jS3Tree: show contents of S3 bucket in a collapsible tree listing.
-  By Tony Mann
-  
-  Place this file at the root of the bucket.
-  
-  Inspired by on Amazon S3 Bucket listing by Francesco Pasqualini.
-  http://aws.amazon.com/code/Amazon-S3/1713
--->
 
 <html>
-  <head>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></
-script>
+<head>
+<title>Sensu Package Repos</title>
+<script type="text/javascript">
+
+<!-- based on: http://download.terracotta.org/index.html -->
+
+var pwd = '';
+var root;
+var currentTree;
+var trek = [];
+var url = "http://repos.sensuapp.org/";
+
+function makeTree(data) {
+  var tree = {};
+  for (var i = 0; i < data.length; i++) {
+   var tokens = data[i].split("/");
+   var branch = tree;
+   for (var b = 0; b < tokens.length; b++) {
+     var t = tokens[b];
+     if ( !branch[t] ) {
+       branch[t] = {};
+     }
+     branch = branch[t];
+   }
+  }
+  return tree;
+}
+
+function backtrack() {
+  currentTree = trek.pop();
+  pwd = pwd.substring(0, pwd.lastIndexOf("/"));
+  if (!currentTree) currentTree = root;
+  getTree(currentTree);
+}
+
+function getTree(tree, branch) {
+  if (branch) {
+   currentTree = tree[branch];
+   trek.push(tree);
+   pwd += "/" + branch;
+  }
+  display = "<a style='color:green' href=\"javascript:backtrack()\">PARENT DIRECTORY</a><br/>\n";   
+  display += displayTree(currentTree);
+
+  document.getElementById("display").innerHTML = display;
+  document.getElementById("pwd").innerHTML = pwd;
+}
+
+function displayTree(tree) {
+  var display = '';
+  for (var b in tree) {
+   if (tree.hasOwnProperty(b)) {
+     if (isLeaf(tree[b])) {
+       display += "<a href='" + url + pwd + "/" + b + "'>" + b + "</i><br/>\n";
+     } else {
+       display += "<a style='font-weight:bold' href=\"javascript:getTree(currentTree, '" + b + "')\">" + b + "</a><br/>\n";
+     }
+   }
+  }
+  return display;
+}
+
+function isLeaf(b) {
+  for (var l in b) {
+    if (!b.hasOwnProperty[l]) return false;
+  }
+  return true;
+}
+
+function parse(xmlDoc) {
+  var data = [];
+  var keys = xmlDoc.getElementsByTagName("Key");
+  for (var i = 0; i < keys.length; i++) {
+    var e = keys[i].firstChild.nodeValue;
     
-    <style>
-      ul            { margin-bottom:0; margin-top:0; padding-left:20px; list-style:none }
-      ul.root       { padding-left: 0 }
-      .dir a        { font-weight:bold; text-decoration: none; color: #2200cc }
-      .file a       { color: black; text-decoration: none }
-      .file a:hover { text-decoration: underline }
-    </style>
+    // only interested in folders starting with "maven2"    
+    if (e.indexOf("/./") < 0)
+      data.push(e);
+  }  
+  return data;
+}
 
-    <title>File listing</title>
-  
-    <script>
-      $(function() {
-          $.ajax({
-            url: window.location.protocol + '//' + window.location.hostname,
-            dataFormat: 'xml',
-            success: function(data) {
-              var contents = $(data).find('Contents');
-              var files = [];
-        
-              for (i = 0; i < contents.length; i++) {
-                files.push($(contents[i]).find('Key').text());
-              }
-              
-              files.sort();
-              generateListing(files);
-            }
-          });
-      });
-
-      function generateListing(files) {
-        var out = '<ul class="root">';
-        var dirs = [];
-        var dir = '';
-
-        for (i = 0; i < files.length; i++) {
-          var name = files[i];
-          
-          if ('/' + name == window.location.pathname) {
-            continue;
-          }
-
-          while (dir.length > 0 && name.substring(0, dir.length) != dir) {
-            dir = dirs.pop();
-            out = out + '</ul>';
-          }
-
-          var klass = 'file';
-          var title = name.substring(dir.length);
-          var url   = name;
-          
-          var match = /^(.*)\/$/.exec(title);
-
-          if (match) {
-            klass = 'dir';
-            title = match[1];
-            url = '#';
-            
-            dirs.push(dir);
-            dir = name;
-          }
-
-          out = out + '<li class="' + klass + '"><a href="' + url + '">' + title + '</a>' + '</li>';
-
-          if (klass == 'dir') {
-            out = out + '<ul>';
-          }
-        }
-
-        out = out + "</ul>";
-        $('#file_list').html(out);
-        convertListToTree();
+function init(){
+  var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+  request.open("GET", url, true);
+  request.onreadystatechange = function(){
+    if (request.readyState == 4 && request.status == 200) {
+      if (request.responseXML){
+        root = makeTree(parse(request.responseXML));
+        currentTree = root;
+        getTree(root);       
       }
+    }
+  }
+  request.send(null);
+}
 
-      function convertListToTree() {
-        $('.dir').each(function(i) {
-          var parent = $(this);
-          var children = parent.next().hide();
-          parent.find('a').click(function() {
-            children.slideToggle('fast');
-            return false;
-          });
-        });
-      }
-    </script>
-  </head>
-  <body>
-    <h2>File listing</h2>
-    <div id="file_list">
-      Please wait...
-    </div>
-  </body>
+</script>
+</head>
+
+<body onload="init();">
+<h2><a href="https://github.com/sensu/sensu/wiki/Package-Repositories">Sensu</a> Package Repos</h2>
+<p><b>PWD:</b><span id="pwd"></span><p/>
+<div id="display"></div>
+</body>
+
 </html>
+
